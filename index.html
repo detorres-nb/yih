@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>meet.google.com</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #202124;
+    color: white;
+    text-align: center;
+}
+
+.top {
+    padding: 18px;
+    background: #303134;
+    font-size: 22px;
+    text-align: left;
+}
+
+.container {
+    padding: 30px 15px;
+}
+
+video {
+    width: min(90%, 650px);
+    background: #111;
+    border-radius: 14px;
+    margin: 20px auto;
+    display: none;
+    transform: scaleX(-1);
+}
+
+button {
+    border: 0;
+    border-radius: 25px;
+    padding: 14px 25px;
+    margin: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.leave {
+    background: #ea4335;
+    color: white;
+    display: none;
+}
+
+#surprise {
+    display: none;
+    font-size: clamp(36px, 8vw, 75px);
+    font-weight: bold;
+    margin-top: 20vh;
+    color: #ffdf00;
+    animation: pop .5s infinite alternate;
+}
+
+@keyframes pop {
+    from { transform: scale(1); }
+    to { transform: scale(1.08); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="top">📹 meet.google.com</div>
+
+<div class="container" id="meeting">
+    <h2>Ready to join?</h2>
+    <p id="status">Requesting camera access...</p>
+
+    <video id="camera" autoplay playsinline muted></video>
+    <br>
+
+    <button class="leave" id="leaveBtn" onclick="leaveMeeting()">
+        Leave
+    </button>
+</div>
+
+<div id="surprise">AH YEAHHHHH!!! 🤣</div>
+
+<script>
+let stream = null;
+
+async function joinMeeting() {
+    const status = document.getElementById("status");
+
+    try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+            throw new Error("Camera unavailable");
+        }
+
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+        });
+
+        const camera = document.getElementById("camera");
+        camera.srcObject = stream;
+        camera.style.display = "block";
+
+        status.textContent = "Camera is on.";
+        document.getElementById("leaveBtn").style.display = "inline-block";
+
+    } catch (error) {
+        status.textContent =
+            "Camera permission was not granted or camera is unavailable.";
+    }
+}
+
+function leaveMeeting() {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+    }
+
+    document.getElementById("meeting").style.display = "none";
+    document.getElementById("surprise").style.display = "block";
+}
+
+// Automatically request camera permission when the page opens
+window.addEventListener("load", joinMeeting);
+</script>
+
+</body>
+</html>
